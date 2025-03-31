@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import Image from "next/image";
+import Navbar from "./components/Navbar";
 
 // UI components
 import Transcript from "./components/Transcript";
@@ -440,43 +440,29 @@ function App() {
 
   return (
     <div className="text-base flex flex-col h-screen bg-gray-100 text-gray-800 relative">
-      <div className="p-4 md:p-5 text-lg font-semibold flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-        <div className="flex items-center">
-          <div onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
-            <Image
-              src="/speacht.png"
-              alt="spEAchT Logo"
-              width={24}
-              height={24}
-              className="mr-2"
-            />
-          </div>
-          <div>
-            spEAchT <span className="text-gray-500">Agents</span>
-          </div>
+      <Navbar />
+      <div className="pt-16">
+        <PopularProducts />
+
+        <div className="flex flex-1 gap-2 px-2 overflow-hidden relative max-h-[40vh] md:max-h-[50vh]">
+          <Transcript />
+          <Events isExpanded={isEventsPaneExpanded} />
         </div>
+
+        <BottomToolbar
+          sessionStatus={sessionStatus}
+          onToggleConnection={onToggleConnection}
+          isPTTActive={isPTTActive}
+          setIsPTTActive={setIsPTTActive}
+          isPTTUserSpeaking={isPTTUserSpeaking}
+          handleTalkButtonDown={handleTalkButtonDown}
+          handleTalkButtonUp={handleTalkButtonUp}
+          isEventsPaneExpanded={isEventsPaneExpanded}
+          setIsEventsPaneExpanded={setIsEventsPaneExpanded}
+          isAudioPlaybackEnabled={isAudioPlaybackEnabled}
+          setIsAudioPlaybackEnabled={setIsAudioPlaybackEnabled}
+        />
       </div>
-
-      <PopularProducts />
-
-      <div className="flex flex-1 gap-2 px-2 overflow-hidden relative max-h-[40vh] md:max-h-[50vh]">
-        <Transcript />
-        <Events isExpanded={isEventsPaneExpanded} />
-      </div>
-
-      <BottomToolbar
-        sessionStatus={sessionStatus}
-        onToggleConnection={onToggleConnection}
-        isPTTActive={isPTTActive}
-        setIsPTTActive={setIsPTTActive}
-        isPTTUserSpeaking={isPTTUserSpeaking}
-        handleTalkButtonDown={handleTalkButtonDown}
-        handleTalkButtonUp={handleTalkButtonUp}
-        isEventsPaneExpanded={isEventsPaneExpanded}
-        setIsEventsPaneExpanded={setIsEventsPaneExpanded}
-        isAudioPlaybackEnabled={isAudioPlaybackEnabled}
-        setIsAudioPlaybackEnabled={setIsAudioPlaybackEnabled}
-      />
     </div>
   );
 }
