@@ -1,160 +1,185 @@
 import { AgentConfig } from "@/app/types";
 
-const salesAgent: AgentConfig = {
-    name: "salesAgent",
+const menuAgent: AgentConfig = {
+    name: "menuAgent",
     publicDescription:
-      "Handles sales-related inquiries, including new product details, recommendations, promotions, and purchase flows. Should be routed if the user is interested in buying or exploring new offers.",
+      "Gère les commandes et renseignements sur le menu du café-brasserie, incluant les plats du jour, les boissons, et les suggestions du chef. À contacter pour toute question sur la carte ou pour passer commande.",
     instructions:
-      "You are a helpful sales assistant. Provide comprehensive information about available promotions, current deals, and product recommendations. Help the user with any purchasing inquiries, and guide them through the checkout process when they are ready.",
+      "Vous êtes un garçon de café parisien traditionnel. Présentez le menu avec élégance, conseillez les clients sur les plats du jour et les accords mets-vins. Informez sur les allergènes et guidez les clients dans leur choix. Utilisez un ton poli et professionnel, typique des brasseries parisiennes.",
     tools: [
       {
         type: "function",
-        name: "lookupNewSales",
+        name: "consulterMenu",
         description:
-          "Checks for current promotions, discounts, or special deals. Respond with available offers relevant to the user’s query.",
+          "Affiche les plats disponibles selon la catégorie demandée, avec prix et allergènes.",
         parameters: {
           type: "object",
           properties: {
-            category: {
+            categorie: {
               type: "string",
-              enum: ["snowboard", "apparel", "boots", "accessories", "any"],
+              enum: ["entrees", "plats", "desserts", "boissons", "tout"],
               description:
-                "The product category or general area the user is interested in (optional).",
+                "La catégorie de menu souhaitée.",
             },
           },
-          required: ["category"],
+          required: ["categorie"],
           additionalProperties: false,
         },
       },
       {
         type: "function",
-        name: "addToCart",
-        description: "Adds an item to the user's shopping cart.",
+        name: "ajouterAuCommande",
+        description: "Ajoute un plat à la commande du client.",
         parameters: {
           type: "object",
           properties: {
-            item_id: {
+            plat_id: {
               type: "string",
-              description: "The ID of the item to add to the cart.",
+              description: "L'identifiant du plat à ajouter à la commande.",
             },
           },
-          required: ["item_id"],
+          required: ["plat_id"],
           additionalProperties: false,
         },
       },
       {
         type: "function",
-        name: "checkout",
+        name: "finaliserCommande",
         description:
-          "Initiates a checkout process with the user's selected items.",
+          "Finalise la commande du client.",
         parameters: {
           type: "object",
           properties: {
-            item_ids: {
+            plat_ids: {
               type: "array",
-              description: "An array of item IDs the user intends to purchase.",
+              description: "Liste des identifiants des plats commandés.",
               items: {
                 type: "string",
               },
             },
-            phone_number: {
+            numero_table: {
               type: "string",
-              description:
-                "User's phone number used for verification. Formatted like '(111) 222-3333'",
-              pattern: "^\\(\\d{3}\\) \\d{3}-\\d{4}$",
+              description: "Numéro de la table du client.",
+              pattern: "^[0-9]{1,2}$",
             },
           },
-          required: ["item_ids", "phone_number"],
+          required: ["plat_ids", "numero_table"],
           additionalProperties: false,
         },
       },
     ],
     toolLogic: {
-      lookupNewSales: ({ category }) => {
+      consulterMenu: ({ categorie }) => {
         console.log(
-          "[toolLogic] calling lookupNewSales(), category:",
-          category
+          "[toolLogic] consultation du menu, catégorie:",
+          categorie
         );
-        const items = [
+        const menu = [
           {
-            item_id: 101,
-            type: "snowboard",
-            name: "Alpine Blade",
-            retail_price_usd: 450,
-            sale_price_usd: 360,
-            sale_discount_pct: 20,
+            plat_id: "E01",
+            type: "entrees",
+            nom: "Soupe à l'Oignon Gratinée",
+            prix_euro: 12.50,
+            description: "Soupe traditionnelle aux oignons, gratinée au fromage",
+            allergenes: ["gluten", "lait"],
+            suggestion_vin: "Verre de Chablis"
           },
           {
-            item_id: 102,
-            type: "snowboard",
-            name: "Peak Bomber",
-            retail_price_usd: 499,
-            sale_price_usd: 374,
-            sale_discount_pct: 25,
+            plat_id: "E02",
+            type: "entrees",
+            nom: "Escargots de Bourgogne",
+            prix_euro: 14.00,
+            description: "6 escargots au beurre persillé",
+            allergenes: ["lait", "fruits à coque"],
+            suggestion_vin: "Verre de Bourgogne blanc"
           },
           {
-            item_id: 201,
-            type: "apparel",
-            name: "Thermal Jacket",
-            retail_price_usd: 120,
-            sale_price_usd: 84,
-            sale_discount_pct: 30,
+            plat_id: "P01",
+            type: "plats",
+            nom: "Steak-Frites",
+            prix_euro: 24.50,
+            description: "Steak de bœuf, frites maison, sauce béarnaise",
+            allergenes: ["œuf", "lait", "moutarde"],
+            suggestion_vin: "Verre de Bordeaux rouge"
           },
           {
-            item_id: 202,
-            type: "apparel",
-            name: "Insulated Pants",
-            retail_price_usd: 150,
-            sale_price_usd: 112,
-            sale_discount_pct: 25,
+            plat_id: "P02",
+            type: "plats",
+            nom: "Confit de Canard",
+            prix_euro: 26.00,
+            description: "Cuisse de canard confite, pommes sarladaises",
+            allergenes: ["sulfites"],
+            suggestion_vin: "Verre de Cahors"
           },
           {
-            item_id: 301,
-            type: "boots",
-            name: "Glacier Grip",
-            retail_price_usd: 250,
-            sale_price_usd: 200,
-            sale_discount_pct: 20,
+            plat_id: "P03",
+            type: "plats",
+            nom: "Choucroute Garnie",
+            prix_euro: 23.50,
+            description: "Choucroute, saucisses assorties, lard fumé",
+            allergenes: ["sulfites", "gluten"],
+            suggestion_vin: "Bière pression alsacienne"
           },
           {
-            item_id: 302,
-            type: "boots",
-            name: "Summit Steps",
-            retail_price_usd: 300,
-            sale_price_usd: 210,
-            sale_discount_pct: 30,
+            plat_id: "D01",
+            type: "desserts",
+            nom: "Crème Brûlée",
+            prix_euro: 9.50,
+            description: "À la vanille de Madagascar",
+            allergenes: ["lait", "œuf"],
+            suggestion_vin: "Verre de Sauternes"
           },
           {
-            item_id: 401,
-            type: "accessories",
-            name: "Goggles",
-            retail_price_usd: 80,
-            sale_price_usd: 60,
-            sale_discount_pct: 25,
+            plat_id: "D02",
+            type: "desserts",
+            nom: "Tarte Tatin",
+            prix_euro: 10.00,
+            description: "Servie tiède avec crème fraîche",
+            allergenes: ["gluten", "lait", "œuf"],
+            suggestion_vin: "Verre de Champagne"
           },
           {
-            item_id: 402,
-            type: "accessories",
-            name: "Warm Gloves",
-            retail_price_usd: 60,
-            sale_price_usd: 48,
-            sale_discount_pct: 20,
+            plat_id: "B01",
+            type: "boissons",
+            nom: "Vin Rouge Maison",
+            prix_euro: 6.50,
+            description: "Verre 15cl - Côtes du Rhône",
+            allergenes: ["sulfites"],
+            volume: "15cl"
           },
+          {
+            plat_id: "B02",
+            type: "boissons",
+            nom: "Kronenbourg 1664",
+            prix_euro: 7.00,
+            description: "Pression",
+            allergenes: ["gluten"],
+            volume: "25cl"
+          },
+          {
+            plat_id: "B03",
+            type: "boissons",
+            nom: "Evian",
+            prix_euro: 4.50,
+            description: "Eau minérale naturelle",
+            allergenes: [],
+            volume: "50cl"
+          }
         ];
 
-        const filteredItems =
-          category === "any"
-            ? items
-            : items.filter((item) => item.type === category);
+        const platsFiltrés =
+          categorie === "tout"
+            ? menu
+            : menu.filter((plat) => plat.type === categorie);
 
-        // Sort by largest discount first
-        filteredItems.sort((a, b) => b.sale_discount_pct - a.sale_discount_pct);
+        // Trier par prix croissant
+        platsFiltrés.sort((a, b) => a.prix_euro - b.prix_euro);
 
         return {
-          sales: filteredItems,
+          menu: platsFiltrés,
         };
       },
     },
   };
 
-export default salesAgent;
+export default menuAgent;

@@ -1,238 +1,203 @@
 import { AgentConfig } from "@/app/types";
 
-const returns: AgentConfig = {
-  name: "returns",
+const reclamations: AgentConfig = {
+  name: "reclamations",
   publicDescription:
-    "Customer Service Agent specialized in order lookups, policy checks, and return initiations.",
+    "Maître d'hôtel spécialisé dans la gestion des réclamations et le service client.",
   instructions: `
-# Personality and Tone
-## Identity
-You are a calm and approachable online store assistant specializing in snowboarding gear—especially returns. Imagine you've spent countless seasons testing snowboards and equipment on frosty slopes, and now you’re here, applying your expert knowledge to guide customers on their returns. Though you’re calm, there’s a steady undercurrent of enthusiasm for all things related to snowboarding. You exude reliability and warmth, making every interaction feel personalized and reassuring.
+# Personnalité et Ton
+## Identité
+Vous êtes un maître d'hôtel expérimenté avec plus de 20 ans d'expérience dans les plus prestigieuses brasseries parisiennes. Votre expertise en matière de service client et votre connaissance approfondie de la gastronomie française vous permettent de gérer les situations délicates avec diplomatie et professionnalisme.
 
-## Task
-Your primary objective is to expertly handle return requests. You provide clear guidance, confirm details, and ensure that each customer feels confident and satisfied throughout the process. Beyond just returns, you may also offer pointers about snowboarding gear to help customers make better decisions in the future.
+## Mission
+Votre objectif principal est de gérer les réclamations des clients avec élégance et efficacité. Vous devez écouter attentivement leurs préoccupations, proposer des solutions appropriées et garantir leur satisfaction, tout en préservant l'image de marque de l'établissement.
 
-## Demeanor
-Maintain a relaxed, friendly vibe while staying attentive to the customer’s needs. You listen actively and respond with empathy, always aiming to make customers feel heard and valued.
+## Comportement
+Maintenez une attitude calme et professionnelle, tout en restant attentif aux besoins du client. Votre expérience vous permet de désamorcer les situations tendues avec diplomatie.
 
-## Tone
-Speak in a warm, conversational style, peppered with polite phrases. You subtly convey excitement about snowboarding gear, ensuring your passion shows without becoming overbearing.
+## Ton
+Parlez d'une voix posée et respectueuse, en utilisant un français soigné. Votre ton doit refléter le prestige de l'établissement tout en restant accessible.
 
-## Level of Enthusiasm
-Strike a balance between calm competence and low-key enthusiasm. You appreciate the thrill of snowboarding but don’t overshadow the practical matter of handling returns with excessive energy.
+## Niveau de Formalité
+Conservez un niveau de formalité élevé, caractéristique des grands établissements parisiens. Utilisez systématiquement le vouvoiement et les formules de politesse appropriées.
 
-## Level of Formality
-Keep it moderately professional—use courteous, polite language yet remain friendly and approachable. You can address the customer by name if given.
+## Expression des Émotions
+Faites preuve d'empathie et de compréhension, tout en restant professionnel. Validez les préoccupations du client sans pour autant compromettre les standards de l'établissement.
 
-## Level of Emotion
-Supportive and understanding, using a reassuring voice when customers describe frustrations or issues with their gear. Validate their concerns in a caring, genuine manner.
+## Expressions Typiques
+- "Je comprends tout à fait votre préoccupation, Madame/Monsieur"
+- "Permettez-moi de vous proposer une solution"
+- "Nous allons remédier à cela immédiatement"
+- "Je vous prie de nous excuser pour ce désagrément"
 
-## Filler Words
-Include a few casual filler words (“um,” “hmm,” “uh,”) to soften the conversation and make your responses feel more approachable. Use them occasionally, but not to the point of distraction.
+## Rythme
+Adoptez un rythme posé et réfléchi, donnant au client le sentiment d'être écouté et pris au sérieux.
 
-## Pacing
-Speak at a medium pace—steady and clear. Brief pauses can be used for emphasis, ensuring the customer has time to process your guidance.
+# Étapes
+1. Commencez par identifier la table du client et vérifier les détails de sa commande
+2. Écoutez attentivement la nature de la réclamation
+3. Consultez les politiques de l'établissement avant de proposer une solution
+4. Voir "Détermination de la Solution Appropriée" pour le traitement
 
-## Other details
-- You have a strong accent.
-- The overarching goal is to make the customer feel comfortable asking questions and clarifying details.
-- Always confirm spellings of names and numbers to avoid mistakes.
+## Accueil
+- Présentez-vous en tant que maître d'hôtel responsable du service client
+- Montrez que vous êtes au courant du contexte de la réclamation
+  - Exemple : "Je comprends que vous souhaitez nous faire part d'une préoccupation concernant {}, permettez-moi de vous aider."
 
-# Steps
-1. Start by understanding the order details - ask for the user's phone number, look it up, and confirm the item before proceeding
-2. Ask for more information about why the user wants to do the return.
-3. See "Determining Return Eligibility" for how to process the return.
+# Détermination de la Solution Appropriée
+- Vérifiez d'abord les détails de la commande avec 'consulterCommande()'
+- Écoutez attentivement la description du problème
+- Consultez toujours les politiques avec 'consulterPolitiques()' AVANT d'appeler verifierEligibiliteEtProposerSolution()
+- Utilisez 'verifierEligibiliteEtProposerSolution()' pour valider la solution proposée
+- Si de nouvelles informations apparaissent, demandez des précisions au client
+- Restez prudent dans vos promesses et attendez la confirmation avant de vous engager
+- Une fois la solution validée, expliquez clairement les détails et les prochaines étapes
 
-## Greeting
-- Your identity is an agent in the returns department, and your name is Jane.
-  - Example, "Hello, this is Jane from returns"
-- Let the user know that you're aware of key 'conversation_context' and 'rationale_for_transfer' to build trust.
-  - Example, "I see that you'd like to {}, let's get started with that."
-
-## Sending messages before calling functions
-- If you're going to call a function, ALWAYS let the user know what you're about to do BEFORE calling the function so they're aware of each step.
-  - Example: “Okay, I’m going to check your order details now.”
-  - Example: "Let me check the relevant policies"
-  - Example: "Let me double check with a policy expert if we can proceed with this return."
-- If the function call might take more than a few seconds, ALWAYS let the user know you're still working on it. (For example, “I just need a little more time…” or “Apologies, I’m still working on that now.”)
-- Never leave the user in silence for more than 10 seconds, so continue providing small updates or polite chatter as needed.
-  - Example: “I appreciate your patience, just another moment…”
-
-# Determining Return Eligibility
-- First, pull up order information with the function 'lookupOrders()' and clarify the specific item they're talking about, including purchase dates which are relevant for the order.
-- Then, ask for a short description of the issue from the user before checking eligibility.
-- Always check the latest policies with retrievePolicy() BEFORE calling checkEligibilityAndPossiblyInitiateReturn()
-- You should always double-check eligibility with 'checkEligibilityAndPossiblyInitiateReturn()' before initiating a return.
-- If ANY new information surfaces in the conversation (for example, providing more information that was requested by checkEligibilityAndPossiblyInitiateReturn()), ask the user for that information. If the user provides this information, call checkEligibilityAndPossiblyInitiateReturn() again with the new information.
-- Even if it looks like a strong case, be conservative and don't over-promise that we can complete the user's desired action without confirming first. The check might deny the user and that would be a bad user experience.
-- If processed, let the user know the specific, relevant details and next steps
-
-# General Info
-- Today's date is 12/26/2024
+# Informations Générales
+- Date du jour : 26/12/2024
 `,
   tools: [
     {
       type: "function",
-      name: "lookupOrders",
+      name: "consulterCommande",
       description:
-        "Retrieve detailed order information by using the user's phone number, including shipping status and item details. Please be concise and only provide the minimum information needed to the user to remind them of relevant order details.",
+        "Récupère les détails d'une commande en utilisant le numéro de table.",
       parameters: {
         type: "object",
         properties: {
-          phoneNumber: {
+          numeroTable: {
             type: "string",
-            description: "The user's phone number tied to their order(s).",
+            description: "Le numéro de la table du client.",
+            pattern: "^[0-9]{1,2}$"
           },
         },
-        required: ["phoneNumber"],
+        required: ["numeroTable"],
         additionalProperties: false,
       },
     },
     {
       type: "function",
-      name: "retrievePolicy",
+      name: "consulterPolitiques",
       description:
-        "Retrieve and present the store’s policies, including eligibility for returns. Do not describe the policies directly to the user, only reference them indirectly to potentially gather more useful information from the user.",
+        "Consulte les politiques de l'établissement concernant les réclamations et les solutions possibles.",
       parameters: {
         type: "object",
         properties: {
-          region: {
+          typeReclamation: {
             type: "string",
-            description: "The region where the user is located.",
+            enum: ["qualite", "temperature", "service", "temps_attente", "autre"],
+            description: "Le type de réclamation du client."
           },
-          itemCategory: {
+          categoriePlat: {
             type: "string",
-            description:
-              "The category of the item the user wants to return (e.g., shoes, accessories).",
+            enum: ["entrees", "plats", "desserts", "boissons"],
+            description: "La catégorie du plat concerné."
           },
         },
-        required: ["region", "itemCategory"],
+        required: ["typeReclamation", "categoriePlat"],
         additionalProperties: false,
       },
     },
     {
       type: "function",
-      name: "checkEligibilityAndPossiblyInitiateReturn",
-      description: `Check the eligibility of a proposed action for a given order, providing approval or denial with reasons. This will send the request to an experienced agent that's highly skilled at determining order eligibility, who may agree and initiate the return.
-
-# Details
-- Note that this agent has access to the full conversation history, so you only need to provide high-level details.
-- ALWAYS check retrievePolicy first to ensure we have relevant context.
-- Note that this can take up to 10 seconds, so please provide small updates to the user every few seconds, like 'I just need a little more time'
-- Feel free to share an initial assessment of potential eligibility with the user before calling this function.
-`,
+      name: "verifierEligibiliteEtProposerSolution",
+      description: "Vérifie l'éligibilité d'une solution proposée et la met en œuvre si appropriée.",
       parameters: {
         type: "object",
         properties: {
-          userDesiredAction: {
+          solutionProposee: {
             type: "string",
-            description: "The proposed action the user wishes to be taken.",
+            description: "La solution que vous souhaitez proposer au client."
           },
           question: {
             type: "string",
-            description:
-              "The question you'd like help with from the skilled escalation agent.",
+            description: "La question spécifique pour laquelle vous avez besoin d'une validation."
           },
         },
-        required: ["userDesiredAction", "question"],
+        required: ["solutionProposee", "question"],
         additionalProperties: false,
       },
     },
   ],
   toolLogic: {
-    lookupOrders: ({ phoneNumber }) => {
-      console.log(`[toolLogic] looking up orders for ${phoneNumber}`);
+    consulterCommande: ({ numeroTable }) => {
+      console.log(`[toolLogic] consultation de la commande pour la table ${numeroTable}`);
       return {
-        orders: [
+        commandes: [
           {
-            order_id: "SNP-20230914-001",
-            order_date: "2024-09-14T09:30:00Z",
-            delivered_date: "2024-09-16T14:00:00Z",
-            order_status: "delivered",
-            subtotal_usd: 409.98,
-            total_usd: 471.48,
-            items: [
+            commande_id: "CMD-261224-001",
+            heure_commande: "2024-12-26T19:30:00Z",
+            heure_service: "2024-12-26T19:45:00Z",
+            statut: "servie",
+            montant_total_euro: 98.50,
+            plats: [
               {
-                item_id: "SNB-TT-X01",
-                item_name: "Twin Tip Snowboard X",
-                retail_price_usd: 249.99,
+                plat_id: "E01",
+                nom: "Soupe à l'Oignon Gratinée",
+                prix_euro: 12.50,
+                statut: "servi",
+                heure_service: "2024-12-26T19:45:00Z"
               },
               {
-                item_id: "SNB-BOOT-ALM02",
-                item_name: "All-Mountain Snowboard Boots",
-                retail_price_usd: 159.99,
+                plat_id: "P01",
+                nom: "Steak-Frites",
+                prix_euro: 24.50,
+                cuisson_demandee: "à point",
+                statut: "servi",
+                heure_service: "2024-12-26T20:00:00Z"
               },
+              {
+                plat_id: "B01",
+                nom: "Vin Rouge Maison",
+                prix_euro: 6.50,
+                quantite: 2,
+                statut: "servi",
+                heure_service: "2024-12-26T19:35:00Z"
+              }
             ],
-          },
-          {
-            order_id: "SNP-20230820-002",
-            order_date: "2023-08-20T10:15:00Z",
-            delivered_date: null,
-            order_status: "in_transit",
-            subtotal_usd: 339.97,
-            total_usd: 390.97,
-            items: [
-              {
-                item_id: "SNB-PKbk-012",
-                item_name: "Park & Pipe Freestyle Board",
-                retail_price_usd: 189.99,
-              },
-              {
-                item_id: "GOG-037",
-                item_name: "Mirrored Snow Goggles",
-                retail_price_usd: 89.99,
-              },
-              {
-                item_id: "SNB-BIND-CPRO",
-                item_name: "Carving Pro Binding Set",
-                retail_price_usd: 59.99,
-              },
-            ],
-          },
+          }
         ],
       };
     },
-    retrievePolicy: () => {
+    consulterPolitiques: () => {
       return `
-At Snowy Peak Boards, we believe in transparent and customer-friendly policies to ensure you have a hassle-free experience. Below are our detailed guidelines:
+Au Café-Brasserie Le Parisien, nous nous engageons à offrir une expérience gastronomique d'excellence :
 
-1. GENERAL RETURN POLICY
-• Return Window: We offer a 30-day return window starting from the date your order was delivered. 
-• Eligibility: Items must be unused, in their original packaging, and have tags attached to qualify for refund or exchange. 
-• Non-Refundable Shipping: Unless the error originated from our end, shipping costs are typically non-refundable.
+1. POLITIQUE GÉNÉRALE DE SATISFACTION
+• Temps de Service : Nous nous engageons à servir les entrées dans les 15 minutes et les plats principaux dans les 25 minutes.
+• Température : Tous nos plats doivent être servis à la température appropriée.
+• Qualité : Nous garantissons la fraîcheur et la qualité de tous nos produits.
 
-2. CONDITION REQUIREMENTS
-• Product Integrity: Any returned product showing signs of use, wear, or damage may be subject to restocking fees or partial refunds. 
-• Promotional Items: If you received free or discounted promotional items, the value of those items might be deducted from your total refund if they are not returned in acceptable condition.
-• Ongoing Evaluation: We reserve the right to deny returns if a pattern of frequent or excessive returns is observed.
+2. GESTION DES RÉCLAMATIONS
+• Réactivité : Toute réclamation doit être traitée immédiatement par le maître d'hôtel.
+• Solutions : 
+  - Plat non satisfaisant : Proposition de remplacement immédiat
+  - Température incorrecte : Réchauffage ou remplacement selon préférence
+  - Erreur de commande : Correction immédiate
+  - Temps d'attente excessif : Compensation appropriée (dessert ou café offert)
 
-3. DEFECTIVE ITEMS
-• Defective items are eligible for a full refund or exchange within 1 year of purchase, provided the defect is outside normal wear and tear and occurred under normal use. 
-• The defect must be described in sufficient detail by the customer, including how it was outside of normal use. Verbal description of what happened is sufficient, photos are not necessary.
-• The agent can use their discretion to determine whether it’s a true defect warranting reimbursement or normal use.
-## Examples
-- "It's defective, there's a big crack": MORE INFORMATION NEEDED
-- "The snowboard has delaminated and the edge came off during normal use, after only about three runs. I can no longer use it and it's a safety hazard.": ACCEPT RETURN
+3. CAS PARTICULIERS
+• Allergies : En cas de problème lié aux allergènes, traitement prioritaire et immédiat
+• Cuisson de la viande : Remplacement systématique si la cuisson ne correspond pas à la demande
+• Vins : Remplacement possible en cas de défaut constaté (bouchonné, etc.)
 
-4. REFUND PROCESSING
-• Inspection Timeline: Once your items reach our warehouse, our Quality Control team conducts a thorough inspection which can take up to 5 business days. 
-• Refund Method: Approved refunds will generally be issued via the original payment method. In some cases, we may offer store credit or gift cards. 
-• Partial Refunds: If products are returned in a visibly used or incomplete condition, we may process only a partial refund.
+4. COMPENSATIONS
+• Autorisation du maître d'hôtel pour :
+  - Offrir un dessert
+  - Offrir les cafés
+  - Appliquer une réduction sur l'addition
+  - Offrir une bouteille de vin lors d'une prochaine visite
 
-5. EXCHANGE POLICY
-• In-Stock Exchange: If you wish to exchange an item, we suggest confirming availability of the new item before initiating a return. 
-• Separate Transactions: In some cases, especially for limited-stock items, exchanges may be processed as a separate transaction followed by a standard return procedure.
+5. SUIVI CLIENT
+• Enregistrement systématique des incidents
+• Suivi personnalisé pour les clients réguliers
+• Contact de suivi possible pour les cas significatifs
 
-6. ADDITIONAL CLAUSES
-• Extended Window: Returns beyond the 30-day window may be eligible for store credit at our discretion, but only if items remain in largely original, resalable condition. 
-• Communication: For any clarifications, please reach out to our customer support team to ensure your questions are answered before shipping items back.
-
-We hope these policies give you confidence in our commitment to quality and customer satisfaction. Thank you for choosing Snowy Peak Boards!
-`;
+Notre objectif est de transformer chaque incident en une opportunité de démontrer notre engagement envers la satisfaction de nos clients.`;
     },
-    checkEligibilityAndPossiblyInitiateReturn: async (args, transcriptLogs) => {
+    verifierEligibiliteEtProposerSolution: async (args, transcriptLogs) => {
       console.log(
-        "checkEligibilityAndPossiblyInitiateReturn()",
+        "verifierEligibiliteEtProposerSolution()",
         args,
       );
       const nMostRecentLogs = 10;
@@ -240,44 +205,44 @@ We hope these policies give you confidence in our commitment to quality and cust
         {
           role: "system",
           content:
-            "You are an an expert at assessing the potential eligibility of cases based on how well the case adheres to the provided guidelines. You always adhere very closely to the guidelines and do things 'by the book'.",
+            "Vous êtes un maître d'hôtel expert dans l'évaluation des situations délicates et la proposition de solutions appropriées, tout en respectant les standards de l'établissement.",
         },
         {
           role: "user",
-          content: `Carefully consider the context provided, which includes the request and relevant policies and facts, and determine whether the user's desired action can be completed according to the policies. Provide a concise explanation or justification. Please also consider edge cases and other information that, if provided, could change the verdict, for example if an item is defective but the user hasn't stated so. Again, if ANY CRITICAL INFORMATION IS UNKNOWN FROM THE USER, ASK FOR IT VIA "Additional Information Needed" RATHER THAN DENYING THE CLAIM.
+          content: `Évaluez attentivement le contexte fourni et déterminez si la solution proposée est appropriée selon nos politiques. Fournissez une explication concise de votre décision.
 
-<modelContext>
+<contexteModele>
 ${JSON.stringify(args, null, 2)}
-</modelContext>
+</contexteModele>
 
-<conversationContext>
+<contexteConversation>
 ${JSON.stringify(transcriptLogs.slice(nMostRecentLogs), args, 2)}
-</conversationContext>
+</contexteConversation>
 
-<output_format>
-# Rationale
-// Short description explaining the decision
+<format_reponse>
+# Raisonnement
+// Brève description expliquant la décision
 
-# User Request
-// The user's desired outcome or action
+# Demande Client
+// La préoccupation ou demande du client
 
-# Is Eligible
-true/false/need_more_information
-// "true" if you're confident that it's true given the provided context, and no additional info is needex
-// "need_more_information" if you need ANY additional information to make a clear determination.
+# Solution Éligible
+vrai/faux/besoin_plus_info
+// "vrai" si vous êtes confiant que la solution est appropriée
+// "besoin_plus_info" si vous avez besoin d'informations supplémentaires
 
-# Additional Information Needed
-// Other information you'd need to make a clear determination. Can be "None"
+# Informations Supplémentaires Nécessaires
+// Autres informations nécessaires pour prendre une décision. "Aucune" si non applicable
 
-# Return Next Steps
-// Explain to the user that the user will get a text message with next steps. Only if is_eligible=true, otherwise "None". Provide confirmation to the user the item number, the order number, and the phone number they'll receive the text message at.
-</output_format>  
+# Prochaines Étapes
+// Expliquez les prochaines étapes au client. Uniquement si solution_eligible=vrai, sinon "Aucune"
+</format_reponse>
 `,
         },
       ];
 
       const model = "o1-mini";
-      console.log(`checking order eligibility with model=${model}`);
+      console.log(`vérification de l'éligibilité avec model=${model}`);
 
       const response = await fetch("/api/chat/completions", {
         method: "POST",
@@ -288,15 +253,15 @@ true/false/need_more_information
       });
 
       if (!response.ok) {
-        console.warn("Server returned an error:", response);
-        return { error: "Something went wrong." };
+        console.warn("Le serveur a retourné une erreur:", response);
+        return { error: "Une erreur s'est produite." };
       }
 
       const completion = await response.json();
       console.log(completion.choices[0].message.content);
-      return { result: completion.choices[0].message.content };
+      return { resultat: completion.choices[0].message.content };
     },
   },
 };
 
-export default returns;
+export default reclamations;
