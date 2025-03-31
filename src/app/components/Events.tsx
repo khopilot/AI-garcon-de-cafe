@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useEvent } from "@/app/contexts/EventContext";
 
 interface EventsProps {
   isExpanded: boolean;
