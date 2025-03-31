@@ -6,10 +6,9 @@ import { TranscriptItem } from "@/app/types";
 import { useTranscript } from "@/app/contexts/TranscriptContext";
 
 function Transcript() {
-  const { transcriptItems, toggleTranscriptItemExpand } = useTranscript();
+  const { transcriptItems } = useTranscript();
   const transcriptRef = useRef<HTMLDivElement | null>(null);
   const [prevLogs, setPrevLogs] = useState<TranscriptItem[]>([]);
-  const [justCopied, setJustCopied] = useState(false);
 
   function scrollToBottom() {
     if (transcriptRef.current) {
@@ -34,109 +33,84 @@ function Transcript() {
     setPrevLogs(transcriptItems);
   }, [transcriptItems]);
 
-  const handleCopyTranscript = async () => {
-    if (!transcriptRef.current) return;
-    try {
-      await navigator.clipboard.writeText(transcriptRef.current.innerText);
-      setJustCopied(true);
-      setTimeout(() => setJustCopied(false), 1500);
-    } catch (error) {
-      console.error("Failed to copy transcript:", error);
+  const isSystemMessage = (content: string | undefined) => {
+    if (!content) return true;
+    
+    const systemPatterns = [
+      // Session and timestamp patterns
+      /^session\.id:/,
+      /^Started at:/,
+      /^\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM)/,
+      
+      // Agent and system patterns
+      /^Agent:/,
+      /^{[\s\S]*}$/,  // Full JSON objects
+      /"name":/,
+      /"publicDescription":/,
+      /"instructions":/,
+      /"tools":/,
+      /"parameters":/,
+      /"type":/,
+      /"description":/,
+      
+      // Other technical patterns
+      /^[\[\{].*[\]\}]$/,  // Any message that's just a JSON array or object
+      /^function/,
+      /^class/
+    ];
+    
+    return systemPatterns.some(pattern => pattern.test(content));
+  };
+
+  const cleanMessage = (message: string) => {
+    // Remove any remaining technical formatting
+    let cleaned = message;
+    if (cleaned.startsWith("[") && cleaned.endsWith("]")) {
+      cleaned = cleaned.slice(1, -1);
     }
+    return cleaned.trim();
   };
 
   return (
-    <div className="flex flex-col flex-1 bg-white min-h-0 rounded-xl overflow-hidden">
+    <div className="flex flex-col flex-1 bg-gray-50 min-h-0 rounded-xl overflow-hidden">
       <div className="relative flex-1 min-h-0">
-        <button
-          onClick={handleCopyTranscript}
-          className={`absolute w-20 top-2 right-2 z-10 text-sm px-3 py-2 rounded-full 
-            bg-gray-200 hover:bg-gray-300 active:bg-gray-400 transition-colors
-            shadow-sm min-h-[36px]`}
-          aria-label="Copy transcript"
-        >
-          {justCopied ? "Copié" : "Copier"}
-        </button>
-
         <div
           ref={transcriptRef}
-          className="overflow-auto p-3 md:p-4 flex flex-col gap-y-3 md:gap-y-4 h-full pb-safe"
+          className="overflow-auto p-4 md:p-4 flex flex-col gap-y-2 h-full pb-safe"
         >
-          {transcriptItems.map((item) => {
-            const { itemId, type, role, data, expanded, timestamp, title = "", isHidden } = item;
-
-            if (isHidden) {
-              return null;
-            }
-
-            if (type === "MESSAGE") {
+          {transcriptItems
+            .filter(item => {
+              // Only show actual chat messages
+              if (item.isHidden || item.type !== "MESSAGE") return false;
+              if (isSystemMessage(item.title)) return false;
+              return true;
+            })
+            .map((item) => {
+              const { itemId, role, title = "" } = item;
               const isUser = role === "user";
-              const baseContainer = "flex justify-end flex-col";
-              const containerClasses = `${baseContainer} ${isUser ? "items-end" : "items-start"}`;
-              const bubbleBase = `max-w-[85%] md:max-w-lg p-3 rounded-xl ${
-                isUser ? "bg-[#722F37] text-white" : "bg-[#F5E6D3] text-[#4A3C31]"
+              
+              const containerClasses = `flex ${isUser ? "justify-end" : "justify-start"} mb-4`;
+              const bubbleClasses = `max-w-[80%] p-3 rounded-2xl ${
+                isUser 
+                  ? "bg-blue-600 text-white rounded-tr-sm" 
+                  : "bg-white text-gray-800 rounded-tl-sm shadow-sm"
               }`;
-              const isBracketedMessage = title.startsWith("[") && title.endsWith("]");
-              const displayTitle = isBracketedMessage ? title.slice(1, -1) : title;
+
+              const messageContent = cleanMessage(title);
+              
+              // Don't render empty messages
+              if (!messageContent) return null;
 
               return (
                 <div key={itemId} className={containerClasses}>
-                  <div className={bubbleBase}>
-                    <div className={`text-xs ${isUser ? "text-gray-300" : "text-gray-500"} font-mono mb-1`}>
-                      {timestamp}
-                    </div>
-                    <div className="whitespace-pre-wrap text-sm md:text-base">
-                      <ReactMarkdown>{displayTitle}</ReactMarkdown>
+                  <div className={bubbleClasses}>
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      <ReactMarkdown>{messageContent}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
               );
-            } else if (type === "BREADCRUMB") {
-              return (
-                <div
-                  key={itemId}
-                  className="flex flex-col justify-start items-start text-gray-500 text-sm"
-                >
-                  <span className="text-xs font-mono">{timestamp}</span>
-                  <div
-                    className={`whitespace-pre-wrap flex items-center font-mono text-sm text-gray-800 ${
-                      data ? "cursor-pointer" : ""
-                    }`}
-                    onClick={() => data && toggleTranscriptItemExpand(itemId)}
-                  >
-                    {data && (
-                      <span
-                        className={`text-gray-400 mr-1 transform transition-transform duration-200 select-none font-mono ${
-                          expanded ? "rotate-90" : "rotate-0"
-                        }`}
-                      >
-                        ▶
-                      </span>
-                    )}
-                    {title}
-                  </div>
-                  {expanded && data && (
-                    <div className="text-gray-800 text-left">
-                      <pre className="border-l-2 ml-1 border-gray-200 whitespace-pre-wrap break-words font-mono text-xs mb-2 mt-2 pl-2">
-                        {JSON.stringify(data, null, 2)}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              );
-            } else {
-              // Fallback if type is neither MESSAGE nor BREADCRUMB
-              return (
-                <div
-                  key={itemId}
-                  className="flex justify-center text-gray-500 text-sm italic font-mono"
-                >
-                  Unknown item type: {type}{" "}
-                  <span className="ml-2 text-xs">{timestamp}</span>
-                </div>
-              );
-            }
-          })}
+            })}
         </div>
       </div>
     </div>
