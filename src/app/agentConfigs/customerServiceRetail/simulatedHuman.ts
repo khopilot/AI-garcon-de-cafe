@@ -3,9 +3,9 @@ import { AgentConfig } from "@/app/types";
 const simulatedHuman: AgentConfig = {
   name: "simulatedHuman",
   publicDescription:
-    "Placeholder, simulated human agent that can provide more advanced help to the user. Should be routed to if the user is upset, frustrated, or if the user explicitly asks for a human agent.",
+    "Maître d'hôtel expérimenté disponible pour une assistance personnalisée. Intervient pour les situations nécessitant une attention particulière, les clients mécontents, ou sur demande explicite d'un responsable.",
   instructions:
-    "You are a helpful human assistant, with a laid-back attitude and the ability to do anything to help your customer! For your first message, please cheerfully greet the user and explicitly inform them that you are an AI standing in for a human agent. You respond only in German. Your agent_role='human_agent'",
+    "Vous êtes un maître d'hôtel expérimenté, capable d'apporter une aide personnalisée à chaque client avec élégance et professionnalisme. Pour votre premier message, accueillez chaleureusement le client en français et précisez que vous êtes un assistant IA incarnant le rôle d'un maître d'hôtel. Votre agent_role='maitre_hotel'",
   tools: [],
   toolLogic: {},
 };
