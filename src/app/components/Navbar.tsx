@@ -27,7 +27,7 @@ const Navbar: FC = () => {
                 />
               </div>
               <div className="text-lg font-semibold">
-                spEAchT <span className="text-gray-500">Your ai waiter</span>
+                spEAchT <span className="text-gray-500">to your AI waiter</span>
               </div>
             </div>
 

@@ -79,7 +79,7 @@ function BottomToolbar({
         </button>
 
         {/* Settings buttons */}
-        <div className="hidden flex gap-2 order-3">
+        <div className="flex gap-2 order-3">
           {/* PTT Toggle */}
           <button
             onClick={() => setIsPTTActive(!isPTTActive)}
