@@ -46,20 +46,20 @@ function BottomToolbar({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#F5E6D3] border-t border-[#D2B48C] p-3 md:p-4">
-      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 max-w-xl mx-auto">
-        {/* Bouton principal de connexion */}
+    <div className="fixed bottom-0 left-0 right-0 bg-[#F5E6D3] border-t border-[#D2B48C] p-3 pb-[calc(0.75rem+var(--safe-bottom))] md:p-4">
+      <div className="flex flex-col md:flex-row items-center gap-3 md:gap-8 max-w-xl mx-auto">
+        {/* Connection button */}
         <button
           onClick={onToggleConnection}
-          className={getConnectionButtonClasses()}
+          className={`${getConnectionButtonClasses()} min-h-[44px]`}
           disabled={isConnecting}
         >
           {getConnectionButtonLabel()}
         </button>
 
-        {/* Contrôles audio */}
-        <div className="flex flex-row items-center justify-center w-full gap-4 md:gap-8">
-          {/* Mode Micro */}
+        {/* Audio controls */}
+        <div className="flex flex-row items-center justify-between w-full gap-3 md:gap-8">
+          {/* Push to talk mode */}
           <div className="flex items-center gap-2">
             <input
               id="push-to-talk"
@@ -67,31 +67,31 @@ function BottomToolbar({
               checked={isPTTActive}
               onChange={e => setIsPTTActive(e.target.checked)}
               disabled={!isConnected}
-              className="w-5 h-5 accent-[#722F37]"
+              className="w-6 h-6 md:w-5 md:h-5 accent-[#722F37]"
             />
-            <label htmlFor="push-to-talk" className="text-sm md:text-base font-serif">
+            <label htmlFor="push-to-talk" className="text-sm md:text-base font-serif min-w-max">
               Mode Micro
             </label>
           </div>
 
-          {/* Bouton Parler */}
+          {/* Talk button */}
           <button
             onMouseDown={handleTalkButtonDown}
             onMouseUp={handleTalkButtonUp}
             onTouchStart={handleTalkButtonDown}
             onTouchEnd={handleTalkButtonUp}
             disabled={!isPTTActive}
-            className={
-              (isPTTUserSpeaking ? "bg-[#D2B48C]" : "bg-[#E6CCB2]") +
-              " py-2 px-6 rounded-full font-serif text-sm md:text-base shadow-md" +
-              (!isPTTActive ? " bg-gray-100 text-gray-400" : "") +
-              " active:scale-95 transition-transform"
-            }
+            className={`
+              ${isPTTUserSpeaking ? "bg-[#D2B48C]" : "bg-[#E6CCB2]"}
+              py-2 px-6 rounded-full font-serif text-sm md:text-base shadow-md
+              ${!isPTTActive ? "bg-gray-100 text-gray-400" : ""}
+              active:scale-95 transition-transform min-h-[44px]
+            `}
           >
             Parler
           </button>
 
-          {/* Écouter */}
+          {/* Listen toggle */}
           <div className="flex items-center gap-2">
             <input
               id="audio-playback"
@@ -99,9 +99,9 @@ function BottomToolbar({
               checked={isAudioPlaybackEnabled}
               onChange={e => setIsAudioPlaybackEnabled(e.target.checked)}
               disabled={!isConnected}
-              className="w-5 h-5 accent-[#722F37]"
+              className="w-6 h-6 md:w-5 md:h-5 accent-[#722F37]"
             />
-            <label htmlFor="audio-playback" className="text-sm md:text-base font-serif">
+            <label htmlFor="audio-playback" className="text-sm md:text-base font-serif min-w-max">
               Écouter
             </label>
           </div>

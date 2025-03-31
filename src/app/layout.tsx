@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import type { Viewport } from 'next';
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Realtime API Agents",
-  description: "A demo app from OpenAI.",
+  title: "spEAchT Realtime Agents",
+  description: "A demo app from spEAchT.",
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -13,7 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+      <body suppressHydrationWarning className="antialiased min-h-[100dvh] overflow-x-hidden bg-[#fafafa]">
+        {children}
+      </body>
     </html>
   );
 }

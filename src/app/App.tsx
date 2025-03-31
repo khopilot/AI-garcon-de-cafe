@@ -409,26 +409,29 @@ function App() {
         <div className="flex items-center">
           <div onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
             <Image
-              src="/openai-logomark.svg"
-              alt="OpenAI Logo"
-              width={20}
-              height={20}
+              src="/speacht.png"
+              alt="spEAchT Logo"
+              width={24}
+              height={24}
               className="mr-2"
             />
           </div>
           <div>
-            Realtime API <span className="text-gray-500">Agents</span>
+            spEAchT <span className="text-gray-500">Agents</span>
           </div>
         </div>
         <div className="flex items-center">
-          <label className="flex items-center text-base gap-1 mr-2 font-medium">
+          <label htmlFor="scenario-select" className="flex items-center text-base gap-1 mr-2 font-medium">
             Scenario
           </label>
           <div className="relative inline-block">
             <select
+              id="scenario-select"
+              name="scenario"
               value={agentSetKey}
               onChange={handleAgentChange}
               className="appearance-none border border-gray-300 rounded-lg text-base px-2 py-1 pr-8 cursor-pointer font-normal focus:outline-none"
+              aria-label="Select scenario"
             >
               {Object.keys(allAgentSets).map((agentKey) => (
                 <option key={agentKey} value={agentKey}>
@@ -449,14 +452,17 @@ function App() {
 
           {agentSetKey && (
             <div className="flex items-center ml-6">
-              <label className="flex items-center text-base gap-1 mr-2 font-medium">
+              <label htmlFor="agent-select" className="flex items-center text-base gap-1 mr-2 font-medium">
                 Agent
               </label>
               <div className="relative inline-block">
                 <select
+                  id="agent-select"
+                  name="agent"
                   value={selectedAgentName}
                   onChange={handleSelectedAgentChange}
                   className="appearance-none border border-gray-300 rounded-lg text-base px-2 py-1 pr-8 cursor-pointer font-normal focus:outline-none"
+                  aria-label="Select agent"
                 >
                   {selectedAgentConfigSet?.map(agent => (
                     <option key={agent.name} value={agent.name}>

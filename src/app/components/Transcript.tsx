@@ -46,11 +46,13 @@ function Transcript() {
   };
 
   return (
-    <div className="flex flex-col flex-1 bg-white min-h-0 rounded-xl">
+    <div className="flex flex-col flex-1 bg-white min-h-0 rounded-xl overflow-hidden">
       <div className="relative flex-1 min-h-0">
         <button
           onClick={handleCopyTranscript}
-          className={`absolute w-20 top-3 right-2 mr-1 z-10 text-sm px-3 py-2 rounded-full bg-gray-200 hover:bg-gray-300`}
+          className={`absolute w-20 top-2 right-2 z-10 text-sm px-3 py-2 rounded-full 
+            bg-gray-200 hover:bg-gray-300 active:bg-gray-400 transition-colors
+            shadow-sm min-h-[36px]`}
           aria-label="Copy transcript"
         >
           {justCopied ? "Copié" : "Copier"}
@@ -58,7 +60,7 @@ function Transcript() {
 
         <div
           ref={transcriptRef}
-          className="overflow-auto p-3 md:p-4 flex flex-col gap-y-3 md:gap-y-4 h-full"
+          className="overflow-auto p-3 md:p-4 flex flex-col gap-y-3 md:gap-y-4 h-full pb-safe"
         >
           {transcriptItems.map((item) => {
             const { itemId, type, role, data, expanded, timestamp, title = "", isHidden } = item;
