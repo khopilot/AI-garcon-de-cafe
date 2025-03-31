@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
@@ -19,12 +19,33 @@ import { AgentConfig, SessionStatus } from "@/app/types";
 import { useTranscript } from "@/app/contexts/TranscriptContext";
 import { useEvent } from "@/app/contexts/EventContext";
 import { useHandleServerEvent } from "./hooks/useHandleServerEvent";
+import { TranscriptProvider } from "@/app/contexts/TranscriptContext";
+import { EventProvider } from "@/app/contexts/EventContext";
 
 // Utilities
 import { createRealtimeConnection } from "./lib/realtimeConnection";
 
 // Agent configs
 import { allAgentSets, defaultAgentSetKey } from "@/app/agentConfigs";
+
+export default function AppWrapper() {
+  return (
+    <TranscriptProvider>
+      <EventProvider>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-[#722F37] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Chargement...</p>
+            </div>
+          </div>
+        }>
+          <App />
+        </Suspense>
+      </EventProvider>
+    </TranscriptProvider>
+  );
+}
 
 function App() {
   const searchParams = useSearchParams();
@@ -459,5 +480,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
