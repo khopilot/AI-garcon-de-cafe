@@ -99,7 +99,7 @@ export default function PopularProducts() {
           className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {popularProducts.map((product) => (
+          {popularProducts.map((product, index) => (
             <div
               key={product.id}
               className="flex-none w-44 snap-start bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
@@ -109,6 +109,8 @@ export default function PopularProducts() {
                   src={product.image}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 768px) 176px, 176px"
+                  priority={index === 0}
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
