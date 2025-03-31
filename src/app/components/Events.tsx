@@ -3,13 +3,14 @@
 import React from "react";
 import { useEvent } from "@/app/contexts/EventContext";
 
-export interface EventsProps {
+interface EventsProps {
   isExpanded: boolean;
 }
 
-// Ce composant ne rendra plus rien - il est maintenant vide
-function Events({ isExpanded }: EventsProps) {
-  return null;
+export default function Events({ isExpanded }: EventsProps) {
+  return isExpanded ? (
+    <div className="hidden md:block w-80 bg-white rounded-lg shadow-sm overflow-hidden">
+      {/* Events panel content */}
+    </div>
+  ) : null;
 }
-
-export default Events;
