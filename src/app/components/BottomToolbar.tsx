@@ -9,8 +9,6 @@ interface BottomToolbarProps {
   isPTTUserSpeaking: boolean;
   handleTalkButtonDown: () => void;
   handleTalkButtonUp: () => void;
-  isEventsPaneExpanded: boolean;
-  setIsEventsPaneExpanded: (val: boolean) => void;
   isAudioPlaybackEnabled: boolean;
   setIsAudioPlaybackEnabled: (val: boolean) => void;
 }
@@ -23,8 +21,6 @@ function BottomToolbar({
   isPTTUserSpeaking,
   handleTalkButtonDown,
   handleTalkButtonUp,
-  isEventsPaneExpanded,
-  setIsEventsPaneExpanded,
   isAudioPlaybackEnabled,
   setIsAudioPlaybackEnabled,
 }: BottomToolbarProps) {
@@ -32,86 +28,84 @@ function BottomToolbar({
   const isConnecting = sessionStatus === "CONNECTING";
 
   function getConnectionButtonLabel() {
-    if (isConnected) return "Disconnect";
-    if (isConnecting) return "Connecting...";
-    return "Connect";
+    if (isConnected) return "Déconnecter";
+    if (isConnecting) return "Connection...";
+    return "Se Connecter";
   }
 
   function getConnectionButtonClasses() {
-    const baseClasses = "text-white text-base p-2 w-36 rounded-full h-full";
+    const baseClasses = "text-white text-sm md:text-base p-2 w-full md:w-36 rounded-full font-serif shadow-md";
     const cursorClass = isConnecting ? "cursor-not-allowed" : "cursor-pointer";
 
     if (isConnected) {
-      // Connected -> label "Disconnect" -> red
-      return `bg-red-600 hover:bg-red-700 ${cursorClass} ${baseClasses}`;
+      // Connected -> label "Disconnect" -> bordeaux color instead of red
+      return `bg-[#722F37] hover:bg-[#8B3D47] ${cursorClass} ${baseClasses}`;
     }
-    // Disconnected or connecting -> label is either "Connect" or "Connecting" -> black
-    return `bg-black hover:bg-gray-900 ${cursorClass} ${baseClasses}`;
+    // Disconnected or connecting -> warm brown instead of black
+    return `bg-[#4A3C31] hover:bg-[#5C4B3D] ${cursorClass} ${baseClasses}`;
   }
 
   return (
-    <div className="p-4 flex flex-row items-center justify-center gap-x-8">
-      <button
-        onClick={onToggleConnection}
-        className={getConnectionButtonClasses()}
-        disabled={isConnecting}
-      >
-        {getConnectionButtonLabel()}
-      </button>
-
-      <div className="flex flex-row items-center gap-2">
-        <input
-          id="push-to-talk"
-          type="checkbox"
-          checked={isPTTActive}
-          onChange={e => setIsPTTActive(e.target.checked)}
-          disabled={!isConnected}
-          className="w-4 h-4"
-        />
-        <label htmlFor="push-to-talk" className="flex items-center cursor-pointer">
-          Push to talk
-        </label>
+    <div className="fixed bottom-0 left-0 right-0 bg-[#F5E6D3] border-t border-[#D2B48C] p-3 md:p-4">
+      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 max-w-xl mx-auto">
+        {/* Bouton principal de connexion */}
         <button
-          onMouseDown={handleTalkButtonDown}
-          onMouseUp={handleTalkButtonUp}
-          onTouchStart={handleTalkButtonDown}
-          onTouchEnd={handleTalkButtonUp}
-          disabled={!isPTTActive}
-          className={
-            (isPTTUserSpeaking ? "bg-gray-300" : "bg-gray-200") +
-            " py-1 px-4 cursor-pointer rounded-full" +
-            (!isPTTActive ? " bg-gray-100 text-gray-400" : "")
-          }
+          onClick={onToggleConnection}
+          className={getConnectionButtonClasses()}
+          disabled={isConnecting}
         >
-          Talk
+          {getConnectionButtonLabel()}
         </button>
-      </div>
 
-      <div className="flex flex-row items-center gap-2">
-        <input
-          id="audio-playback"
-          type="checkbox"
-          checked={isAudioPlaybackEnabled}
-          onChange={e => setIsAudioPlaybackEnabled(e.target.checked)}
-          disabled={!isConnected}
-          className="w-4 h-4"
-        />
-        <label htmlFor="audio-playback" className="flex items-center cursor-pointer">
-          Audio playback
-        </label>
-      </div>
+        {/* Contrôles audio */}
+        <div className="flex flex-row items-center justify-center w-full gap-4 md:gap-8">
+          {/* Mode Micro */}
+          <div className="flex items-center gap-2">
+            <input
+              id="push-to-talk"
+              type="checkbox"
+              checked={isPTTActive}
+              onChange={e => setIsPTTActive(e.target.checked)}
+              disabled={!isConnected}
+              className="w-5 h-5 accent-[#722F37]"
+            />
+            <label htmlFor="push-to-talk" className="text-sm md:text-base font-serif">
+              Mode Micro
+            </label>
+          </div>
 
-      <div className="flex flex-row items-center gap-2">
-        <input
-          id="logs"
-          type="checkbox"
-          checked={isEventsPaneExpanded}
-          onChange={e => setIsEventsPaneExpanded(e.target.checked)}
-          className="w-4 h-4"
-        />
-        <label htmlFor="logs" className="flex items-center cursor-pointer">
-          Logs
-        </label>
+          {/* Bouton Parler */}
+          <button
+            onMouseDown={handleTalkButtonDown}
+            onMouseUp={handleTalkButtonUp}
+            onTouchStart={handleTalkButtonDown}
+            onTouchEnd={handleTalkButtonUp}
+            disabled={!isPTTActive}
+            className={
+              (isPTTUserSpeaking ? "bg-[#D2B48C]" : "bg-[#E6CCB2]") +
+              " py-2 px-6 rounded-full font-serif text-sm md:text-base shadow-md" +
+              (!isPTTActive ? " bg-gray-100 text-gray-400" : "") +
+              " active:scale-95 transition-transform"
+            }
+          >
+            Parler
+          </button>
+
+          {/* Écouter */}
+          <div className="flex items-center gap-2">
+            <input
+              id="audio-playback"
+              type="checkbox"
+              checked={isAudioPlaybackEnabled}
+              onChange={e => setIsAudioPlaybackEnabled(e.target.checked)}
+              disabled={!isConnected}
+              className="w-5 h-5 accent-[#722F37]"
+            />
+            <label htmlFor="audio-playback" className="text-sm md:text-base font-serif">
+              Écouter
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   );
