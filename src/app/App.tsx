@@ -45,7 +45,7 @@ function App() {
 
   const [isEventsPaneExpanded, setIsEventsPaneExpanded] =
     useState<boolean>(true);
-  const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
+  const [isPTTActive, setIsPTTActive] = useState<boolean>(true);
   const [isPTTUserSpeaking, setIsPTTUserSpeaking] = useState<boolean>(false);
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] =
     useState<boolean>(true);
@@ -222,6 +222,7 @@ function App() {
   };
 
   const updateSession = (shouldTriggerResponse: boolean = false) => {
+    console.log("🔄 Updating session with PTT mode:", { isPTTActive });
     sendClientEvent(
       { type: "input_audio_buffer.clear" },
       "clear audio buffer on session update"
@@ -231,15 +232,17 @@ function App() {
       (a) => a.name === selectedAgentName
     );
 
-    const turnDetection = isPTTActive
-      ? null
-      : {
+    const turnDetection = !isPTTActive
+      ? {
           type: "server_vad",
           threshold: 0.5,
           prefix_padding_ms: 300,
           silence_duration_ms: 200,
           create_response: true,
-        };
+        }
+      : null;
+
+    console.log("🎤 Turn detection config:", turnDetection);
 
     const instructions = currentAgent?.instructions || "";
     const tools = currentAgent?.tools || [];
@@ -292,15 +295,40 @@ function App() {
   };
 
   const handleTalkButtonDown = () => {
+    console.log("🎤 Talk button pressed, state:", {
+      sessionStatus,
+      dataChannelState: dataChannel?.readyState,
+      isPTTActive,
+      isPTTUserSpeaking
+    });
+    
     if (sessionStatus !== "CONNECTED" || dataChannel?.readyState !== "open")
       return;
     cancelAssistantSpeech();
 
+    // Enable the audio track
+    if (pcRef.current) {
+      const senders = pcRef.current.getSenders();
+      const audioSender = senders.find(sender => sender.track?.kind === 'audio');
+      if (audioSender && audioSender.track) {
+        audioSender.track.enabled = true;
+        console.log("🎤 Audio track enabled:", audioSender.track.enabled);
+      }
+    }
+
     setIsPTTUserSpeaking(true);
     sendClientEvent({ type: "input_audio_buffer.clear" }, "clear PTT buffer");
+    console.log("🎤 Microphone activated");
   };
 
   const handleTalkButtonUp = () => {
+    console.log("🎤 Talk button released, state:", {
+      sessionStatus,
+      dataChannelState: dataChannel?.readyState,
+      isPTTActive,
+      isPTTUserSpeaking
+    });
+    
     if (
       sessionStatus !== "CONNECTED" ||
       dataChannel?.readyState !== "open" ||
@@ -308,9 +336,20 @@ function App() {
     )
       return;
 
+    // Disable the audio track
+    if (pcRef.current) {
+      const senders = pcRef.current.getSenders();
+      const audioSender = senders.find(sender => sender.track?.kind === 'audio');
+      if (audioSender && audioSender.track) {
+        audioSender.track.enabled = false;
+        console.log("🎤 Audio track disabled:", audioSender.track.enabled);
+      }
+    }
+
     setIsPTTUserSpeaking(false);
     sendClientEvent({ type: "input_audio_buffer.commit" }, "commit PTT");
     sendClientEvent({ type: "response.create" }, "trigger response PTT");
+    console.log("🎤 Microphone deactivated");
   };
 
   const onToggleConnection = () => {
@@ -365,6 +404,17 @@ function App() {
       }
     }
   }, [isAudioPlaybackEnabled]);
+
+  useEffect(() => {
+    console.log("📱 Session status changed:", sessionStatus);
+  }, [sessionStatus]);
+
+  useEffect(() => {
+    console.log("🔄 PTT mode changed:", { isPTTActive });
+    if (sessionStatus === "CONNECTED") {
+      updateSession();
+    }
+  }, [isPTTActive]);
 
   return (
     <div className="text-base flex flex-col h-screen bg-gray-100 text-gray-800 relative">
