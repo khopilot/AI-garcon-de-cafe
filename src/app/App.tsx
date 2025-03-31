@@ -10,6 +10,7 @@ import Image from "next/image";
 import Transcript from "./components/Transcript";
 import Events from "./components/Events";
 import BottomToolbar from "./components/BottomToolbar";
+import PopularProducts from "./components/PopularProducts";
 
 // Types
 import { AgentConfig, SessionStatus } from "@/app/types";
@@ -435,7 +436,9 @@ function App() {
         </div>
       </div>
 
-      <div className="flex flex-1 gap-2 px-2 overflow-hidden relative">
+      <PopularProducts />
+
+      <div className="flex flex-1 gap-2 px-2 overflow-hidden relative max-h-[40vh] md:max-h-[50vh]">
         <Transcript />
         <Events isExpanded={isEventsPaneExpanded} />
       </div>
