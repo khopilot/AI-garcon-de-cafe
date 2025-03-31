@@ -75,7 +75,7 @@ function BottomToolbar({
             order-1 md:order-2
           `}
         >
-          Parler
+          Maintenir pour parler
         </button>
 
         {/* Settings buttons */}
