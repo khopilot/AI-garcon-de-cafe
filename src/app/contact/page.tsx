@@ -111,7 +111,7 @@ export default function ContactPage() {
 
           <div className="bg-[#fcfaf7] p-6 rounded-lg border border-[#f5e9c0] shadow-sm">
             <h2 className="text-2xl font-semibold mb-6 text-[#722F37] font-serif relative pb-3 elegant-border">
-              Horaires d'ouverture
+              Horaires d&apos;ouverture
             </h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-dashed border-[#d4af37] pb-3">
