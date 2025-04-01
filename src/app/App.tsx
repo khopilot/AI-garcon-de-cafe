@@ -4,8 +4,6 @@ import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
-import Navbar from "./components/Navbar";
-
 // UI components
 import Transcript from "./components/Transcript";
 import Events from "./components/Events";
@@ -440,7 +438,6 @@ function App() {
 
   return (
     <div className="text-base flex flex-col h-screen bg-gray-100 text-gray-800 relative">
-      <Navbar />
       <div className="pt-16">
         <PopularProducts />
 

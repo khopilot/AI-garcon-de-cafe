@@ -110,8 +110,9 @@ export default function PopularProducts() {
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 176px, 176px"
-                  priority={index === 0}
+                  priority={index < 2}
                   className="object-cover"
+                  loading={index < 2 ? "eager" : "lazy"}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               </div>
